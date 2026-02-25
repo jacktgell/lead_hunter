@@ -19,11 +19,14 @@ class SearchExecutionError(Exception):
 
 class SearchConstants:
     """Centralized constants for search query execution."""
-    FETCH_MULTIPLIER: Final[int] = 2
+    FETCH_MULTIPLIER: Final[int] = 3 # Increased slightly to handle local pruning
     HREF_KEY: Final[str] = "href"
 
-    ASIAN_FORUM_FIREWALL: Final[
-        str] = "-site:zhihu.com -site:baidu.com -site:csdn.net -site:chiebukuro.yahoo.co.jp -site:sohu.com"
+    # Deterministic local filter to replace the query-based -site: rules
+    ASIAN_FORUM_FIREWALL: Final[Tuple[str, ...]] = (
+        "zhihu.com", "baidu.com", "csdn.net",
+        "chiebukuro.yahoo.co.jp", "sohu.com"
+    )
 
     GLOBAL_REGIONS: Final[List[str]] = [
         "us-en", "ca-en", "uk-en", "ie-en", "au-en", "nz-en",  # West/Oceania
@@ -48,30 +51,32 @@ class DuckDuckGoSearch(ISearchEngine):
     def search(self, query: str, num_results: int = 10) -> List[str]:
         """
         Executes a search query and returns a filtered list of target URLs.
-
-        Args:
-            query: The search string (supports Boolean operators).
-            num_results: The maximum number of valid URLs to return.
-
-        Returns:
-            List[str]: A list of clean, absolute URLs matching the query.
         """
-        # 1. Programmatically inject the negative constraints
-        safe_query = f"{query} {SearchConstants.ASIAN_FORUM_FIREWALL}"
+        safe_query = query
 
-        # 2. Pick a random premium region for this specific search
         target_region = random.choice(SearchConstants.GLOBAL_REGIONS)
 
         logger.info(f"Executing search query in region [{target_region}]: {safe_query}")
         valid_urls: List[str] = []
 
         try:
-            # Fetch surplus results to account for post-fetch pruning attrition
+            # ---------------------------------------------------------
+            # ANTI-BOT FIREWALL: The "Human Jitter"
+            # ---------------------------------------------------------
+            jitter_delay = random.uniform(5.0, 10.0)
+            logger.info(f"Rate limit avoidance: Sleeping for {jitter_delay:.2f}s...")
+            time.sleep(jitter_delay)
+            # ---------------------------------------------------------
+
             fetch_limit = num_results * SearchConstants.FETCH_MULTIPLIER
 
             with DDGS() as ddgs:
-                # 3. Pass the region directly into the DDGS backend
-                results = ddgs.text(safe_query, region=target_region, max_results=fetch_limit)
+                results = ddgs.text(
+                    safe_query,
+                    region=target_region,
+                    max_results=fetch_limit,
+                    backend="api"
+                )
 
                 if not results:
                     logger.warning(f"Search yielded no results for query: {safe_query}")
@@ -82,40 +87,32 @@ class DuckDuckGoSearch(ISearchEngine):
                         break
 
             self._log_results(valid_urls)
-
-            # Enforce rate-limiting constraint to prevent IP ban from DDG
-            time.sleep(self.config.request_delay_sec)
-
             return valid_urls
 
         except Exception as e:
-            # We catch generic exceptions here because the DDGS library can throw
-            # unpredictable HTTP errors, Timeout errors, or JSON decoding errors.
             logger.error(f"Search engine execution failed for query '{safe_query}': {str(e)}", exc_info=True)
-            # Returning an empty list ensures the broader pipeline continues to the next query
+
+            if "429" in str(e) or "403" in str(e):
+                penalty = random.randint(120, 300)
+                logger.warning(f"HTTP 429/403 Detected: Emergency cool-down for {penalty}s...")
+                time.sleep(penalty)
+
             return []
 
     def _process_result(self, result: Dict[str, Any], valid_urls: List[str], max_results: int) -> bool:
         """
         Validates and filters a single search result against domain heuristics.
-
-        Args:
-            result: The raw dictionary payload from the DDGS library.
-            valid_urls: The mutated list of successfully validated URLs.
-            max_results: The target capacity.
-
-        Returns:
-            bool: True if the maximum number of results has been reached.
         """
         url = result.get(SearchConstants.HREF_KEY)
         if not url or not isinstance(url, str):
             return False
 
         parsed_url = urlparse(url)
+        netloc = parsed_url.netloc
 
-        # Domain filtering logic using the pre-computed tuple
-        if parsed_url.netloc.endswith(self._blocked_tlds):
-            logger.debug(f"Search Guard Triggered: Pruning blocked domain -> {url}")
+        # 🛠️ THE FIREWALL: Pruning bad domains in Python rather than in the search query
+        if netloc.endswith(self._blocked_tlds) or netloc.endswith(SearchConstants.ASIAN_FORUM_FIREWALL):
+            logger.debug(f"Search Guard Triggered: Pruning forbidden domain -> {url}")
             return False
 
         valid_urls.append(url)

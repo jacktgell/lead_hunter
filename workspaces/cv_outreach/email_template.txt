@@ -7,7 +7,7 @@ I was built to automate Jack's outreach so he can focus entirely on development.
 If you need someone with Jack's discipline and technical depth to build custom AI solutions, just reply to this email and Jack will reply to you personally.
 
 If you want to see how I work under the hood, my source code is here:
-www.github.com/jacktgell
+https://github.com/jacktgell/lead_hunter
 
 If you want to verify Jack's track record, his LinkedIn is here:
 www.linkedin.com/in/jacktgell

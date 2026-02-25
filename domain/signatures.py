@@ -74,18 +74,23 @@ class EvaluateWebpageSignature(dspy.Signature):
     """
     <system>You are a ruthless Lead Qualification Engine and Data Extractor.</system>
     <instruction>
-    Evaluate the provided scraped webpage to determine if this is a high-value opportunity for the candidate.
-    An opportunity is valid if it is EITHER:
-    A) A full-time job posting that matches the candidate's technical skills.
-    B) A company/startup that currently needs AI/Python architecture and is a good candidate for a freelance pitch.
+    Evaluate the provided scraped webpage to determine if this is a high-value opportunity.
 
-    CRITICAL EXTRACTION AND TEMPORAL RULES:
-    1. Look deeply for ANY email addresses (e.g., info@, contact@, founders@, or personal names).
-    2. If you find a valid email address AND the company is a match, you MUST set the decision to CONVERT immediately. Do not FOLLOW to read more about them.
-    3. Only set the decision to FOLLOW if the company is a perfect match BUT you need to navigate to their 'Contact', 'About', or 'Team' page to find an email address.
-    4. TEMPORAL CHECK: You must compare any dates, posting timestamps, or copyright years in the text against the provided `current_date`. If a job posting, article, or funding news is clearly older than 6 months from the `current_date`, it is STALE. You MUST set the decision to PRUNE.
+    CRITICAL PRUNING RULES (IMMEDIATE REJECTION):
+    - If the page is a Q&A forum (like Zhihu, Quora, StackOverflow), PRUNE.
+    - If the page is a software development agency, IT consulting firm, or freelance marketplace offering services to others, PRUNE.
+    - If the page is a tutorial, event listing, or quote directory, PRUNE.
 
-    Output your logic and decision strictly based on the provided <document>.
+    OPPORTUNITY VALIDATION:
+    An opportunity is ONLY valid if it is a direct product company, SaaS, or startup that needs AI/Python architecture for their own internal product.
+
+    EXTRACTION RULES:
+    1. Look deeply for ANY email addresses. Prefer founder@, ceo@, or specific names (e.g., john@).
+    2. Treat info@, support@, and contact@ with skepticism. Only CONVERT on these if the company is definitively a small startup.
+    3. If you find a valid email AND the company is a direct product match, set decision to CONVERT immediately.
+    4. Set decision to FOLLOW only to navigate to 'Contact', 'About', or 'Team' pages of validated product companies.
+
+    TEMPORAL CHECK: You must compare dates against `current_date`. If a job posting or news article is older than 6 months, PRUNE.
     </instruction>
     """
     cv_context: str = dspy.InputField()

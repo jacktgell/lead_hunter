@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 
 class DspyOllamaLLM(ILLMProvider):
     """
-    Enterprise-grade DSPy implementation of the LLM Provider.
+    DSPy implementation of the LLM Provider.
     Handles semantic routing, structured output enforcement, and zero-shot fallback.
     """
 

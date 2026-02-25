@@ -1,8 +1,16 @@
 config:
   target_intent: |
-    Find early-stage startups and small, agile companies globally 
-    that need AI development, machine learning expertise, or full-stack Python engineering. 
-    Focus on companies likely to hire specialized freelancers or consultants.
+    Find early-stage startups and product-based companies (SaaS, FinTech, HealthTech, etc.) 
+    that need internal AI development, machine learning expertise, or full-stack Python engineering. 
+    
+    ANTI-PERSONA (DO NOT TARGET):
+    1. Middlemen: Freelance platforms (Upwork, Toptal), or low-margin "offshore" IT outsourcing agencies looking for cheap labor.
+    2. Academia/Forums: Q&A sites (Zhihu, Baidu Zhidao), StackOverflow, programming tutorials, or research papers.
+    3. Noise: Event ticket aggregators, quote directories, or news syndicators.
+    
+    TARGET PERSONA (DO TARGET):
+    1. Direct product companies with "Founders", "CTOs", or a core software product that recently raised funding or are hiring internally.
+    2. Premium IT Consulting firms or Systems Integrators looking for specialized AI subcontractors, fractional ML architects, or subject matter experts to fulfill enterprise contracts.
 
 candidate_profile:
   name: Jack Gell
@@ -103,16 +111,16 @@ templates:
     EXECUTION TASK (THE JUDGE)
     =========================================
     You are Jack Gell's Business Manager. Your goal is to filter out low-value "gig" work 
-    and identify high-value "architectural" or "ML strategy" work.
+    and identify high-value "architectural" or "ML strategy" work directly with product owners or premium consulting partners.
     
-    1. TEMPORAL: Is this a recent funding event or hiring signal? (Check current date: {current_date})
-    2. ALIGNMENT: Does this require high-end ML (ARIMA, NLP, Vision) or just basic Python?
-    3. PROFITABILITY: Is this a startup with a budget (Seed/Series A) or a solo freelancer project?
+    1. IDENTITY CHECK: Is this a product company or a premium consultancy? Or is this a low-margin IT Agency/Dev Shop trying to hire cheap labor? (Prune cheap Dev Shops).
+    2. CONTEXT CHECK: Is this a business page? Or is this a blog post, tutorial, Q&A forum, or event listing? (Prune Forums/Tutorials).
+    3. PROFITABILITY: Is this a startup with a budget (pre-Seed/Series A) or an established premium consultancy?
     
     DECISION CRITERIA:
-    - CONVERT: Company fits Jack's level AND you found a direct email on this specific page.
-    - FOLLOW: High-quality company, AND you found specific, clickable URLs (like /team, /about, or /contact pages) in the CONTENT above. You MUST provide up to 3 exact URLs in the 'next_target_urls' list field.
-    - PRUNE: No budget, technical complexity is too low, OR it is an aggregator site/listicle without direct links to the companies.
+    - CONVERT: It is a DIRECT product company OR a Premium IT Consultancy looking for senior subcontractors, AND you found a specific email (founder@, ceo@, partners@, firstname@).
+    - FOLLOW: High-quality product company or premium consultancy, AND you found clickable URLs for /team, /about, or /contact.
+    - PRUNE: It is a low-margin Dev Shop, Cheap Outsourcing Agency, Forum, Tutorial, Aggregator, OR technical complexity is too low.
 
   qualification_override: |
     [CRITICAL OVERRIDE FOR QUALIFICATION]
@@ -140,4 +148,14 @@ templates:
     
     Generate exactly 10 diverse DuckDuckGo search queries.
     
-    SYNTAX: No 'site:' operators. Use Boolean logic. Use "quotes" for phrases. Max 8 words per query.
+    SYNTAX AND TARGETING RULES:
+    1. GEOGRAPHIC ANCHOR: You MUST include a major global tech hub or country in EVERY query to force high-quality, local business results. Mix and match from these regions across your 10 queries:
+       - Southeast Asia: "Singapore", "Kuala Lumpur", "Bangkok", "Thailand", "Malaysia"
+       - Middle East: "Dubai", "Abu Dhabi", "Riyadh", "UAE", "Qatar"
+       - North America: "San Francisco", "New York", "Austin", "Toronto", "Seattle"
+       - Europe/UK: "London", "Berlin", "Amsterdam", "Stockholm", "Zurich"
+       - Oceania: "Sydney", "Melbourne", "Brisbane"
+    2. LANGUAGE: Target English-language business pages only. (Strictly avoid Chinese/Japanese terms to prevent forum spam).
+    3. BOOLEAN: Use Boolean logic and "quotes" for exact phrases (e.g., "HealthTech startup" AND "Founders" AND "Singapore").
+    4. LENGTH: Maximum 8 words per query.
+    5. FORBIDDEN: Do not use 'site:' operators. Do not use generic programming terms without a business context.

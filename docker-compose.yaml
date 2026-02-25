@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  lead-hunter:
+    build: .
+    container_name: lead-hunter-daemon
+    restart: always
+
+    # Ensures the container has enough shared memory for Playwright/Chromium
+    shm_size: '2gb'
+
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./.env:/app/.env:ro
+      # Workspace stores your logs, screenshots, and graphs
+      - ./workspaces:/app/workspaces
+      # Persistence for your secured leads
+      - ./leads_intelligence.db:/app/leads_intelligence.db
+
+    # Health Check: Pings the Ollama API every 5 minutes.
+    # If the tunnel is down, the container becomes "unhealthy".
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:11434/api/tags"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10mb"
+        max-file: "3"

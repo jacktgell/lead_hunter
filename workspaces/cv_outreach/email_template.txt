@@ -1,0 +1,17 @@
+Hello,
+
+I'll be direct: I am a custom AI agent built by Jack Gell. I analyzed your recent web footprint and determined you might be looking for specialized AI engineering.
+
+I was built to automate Jack's outreach so he can focus entirely on development. To give you the facts: Jack is an AI Engineer, a former Cambridge consultant, and an ex-British Infantry soldier. He holds a BEng in Robotic Engineering and an MSc in Data Science.
+
+If you need someone with Jack's discipline and technical depth to build custom AI solutions, just reply to this email and Jack will reply to you personally.
+
+If you want to see how I work under the hood, my source code is here:
+www.github.com/jacktgell
+
+If you want to verify Jack's track record, his LinkedIn is here:
+www.linkedin.com/in/jacktgell
+
+Best,
+
+Jack's Autonomous Agent

@@ -1,0 +1,143 @@
+config:
+  target_intent: |
+    Find early-stage startups and small, agile companies globally 
+    that need AI development, machine learning expertise, or full-stack Python engineering. 
+    Focus on companies likely to hire specialized freelancers or consultants.
+
+candidate_profile:
+  name: Jack Gell
+  title: Commercially-focused Data Scientist and Software Engineer
+  summary: |
+    Proven problem-solver with a consultancy background in delivering practical, 
+    end-to-end ML and data solutions. Experience ranges from delivering client-facing 
+    data projects to single-handedly building a fully autonomous, cloud-native 
+    cryptocurrency trading platform.
+
+  core_skills:
+    ai_machine_learning:
+      - Time-series forecasting (ARIMA, Custom Transformers)
+      - NLP (BERTopic)
+      - Computer Vision (Object Detection/Tracking)
+      - Stepwise Regression
+    languages_and_frameworks:
+      - Python (Flask)
+      - C++
+      - JavaScript
+      - HTML/CSS
+      - React
+    infrastructure_and_data:
+      - GCP (Pub/Sub, Secret Manager)
+      - PostgreSQL
+      - Elasticsearch
+      - Ubuntu/Linux
+      - Web Scraping (BeautifulSoup)
+
+  experience:
+    - role: Founder / Lead Engineer
+      company: Neurakinetic
+      dates: 12/2024 - Present
+      highlights:
+        - Architected and deployed an automated algorithmic trading platform for cryptocurrency futures.
+        - Built scalable data lakes on Ubuntu and engineered hybrid predictive models using ARIMA and custom transformers.
+        - Developed event-driven execution system using GCP Pub/Sub for automated orders.
+        - Implemented automated risk management using Kelly Criterion.
+
+    - role: Data Scientist
+      company: FinRev Trade
+      dates: 11/2023 - 12/2024
+      highlights:
+        - Built core data infrastructure and automated backend pipelines on GCP.
+        - Replaced manual tracking of exchange APIs with targeted web scraping.
+        - Designed internal dashboards using Python and PostgreSQL for real-time business insights.
+
+    - role: Software Engineer
+      company: PA Consulting
+      dates: 09/2021 - 08/2023
+      highlights:
+        - Client-facing engineer for manufacturing, pharma, finance, and government clients.
+        - Applied regression models to correlate factory sensor data with product quality.
+        - Developed CV models for retail footfall analysis and NLP pipelines for forum discussions.
+        - Migrated critical Sybase procedures to PostgreSQL for a US bank.
+
+    - role: Infantry Soldier
+      company: British Army
+      dates: 2009 - 2015
+      highlights:
+        - Developed strong teamwork, attention to detail, and discipline under pressure.
+
+  education:
+    - degree: MSc Data Science
+      institution: University of Sussex
+      focus: Deep Learning, NLP, Reinforcement Learning
+    - degree: BEng Robotic Engineering
+      institution: University of Plymouth
+
+templates:
+  mission_header: |
+    =========================================
+    IMMUTABLE HEADER: MISSION & CANDIDATE
+    =========================================
+    MISSION: Find high-value freelance leads for Jack Gell.
+    TARGET AUDIENCE: Early-stage startups / AI & Python development.
+    CURRENT DATE: {current_date}
+    FORBIDDEN: Do not follow ads. No hallucinated emails. No repeat URLs.
+
+    CANDIDATE:
+    {cv_context}
+
+  detective_prompt: |
+    {mission_header}
+    
+    =========================================
+    INVESTIGATIVE PATHWAY (AGENT MEMORY)
+    =========================================
+    {memory_buffer}
+    
+    =========================================
+    CURRENT OBSERVATION (SCOUT REPORT)
+    =========================================
+    URL: {url}
+    CONTENT: {page_text}
+    
+    =========================================
+    EXECUTION TASK (THE JUDGE)
+    =========================================
+    You are Jack Gell's Business Manager. Your goal is to filter out low-value "gig" work 
+    and identify high-value "architectural" or "ML strategy" work.
+    
+    1. TEMPORAL: Is this a recent funding event or hiring signal? (Check current date: {current_date})
+    2. ALIGNMENT: Does this require high-end ML (ARIMA, NLP, Vision) or just basic Python?
+    3. PROFITABILITY: Is this a startup with a budget (Seed/Series A) or a solo freelancer project?
+    
+    DECISION CRITERIA:
+    - CONVERT: Company fits Jack's level AND you found a direct email on this specific page.
+    - FOLLOW: High-quality company, AND you found specific, clickable URLs (like /team, /about, or /contact pages) in the CONTENT above. You MUST provide up to 3 exact URLs in the 'next_target_urls' list field.
+    - PRUNE: No budget, technical complexity is too low, OR it is an aggregator site/listicle without direct links to the companies.
+
+  qualification_override: |
+    [CRITICAL OVERRIDE FOR QUALIFICATION]
+    Do NOT be overly strict. We are casting a wider net. 
+    If the company or individual would reasonably be impressed by the candidate's background 
+    and has the potential to hire them, work with them, or benefit from their skills, 
+    you MUST aggressively extract any available email addresses decide the most appropriate one and choose the 'CONVERT' decision. 
+    Err heavily on the side of CONVERT if an email is present.
+
+  meta_prompt: |
+    You are an expert prompt engineer and OSINT recruiter. Analyze the candidate and target intent.
+    Write a RAW instruction prompt for a search AI.
+    
+    CANDIDATE: 
+    {cv_context}
+    
+    TARGET: 
+    {user_prompt}
+    
+    RULES: Focus on "Hidden Job Market" and freelance/contractor intent.
+
+  execution_prompt: |
+    Strategy: 
+    {dynamic_instructions}
+    
+    Generate exactly 10 diverse DuckDuckGo search queries.
+    
+    SYNTAX: No 'site:' operators. Use Boolean logic. Use "quotes" for phrases. Max 8 words per query.

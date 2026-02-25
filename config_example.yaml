@@ -1,0 +1,107 @@
+# ==========================================================
+# LEAD HUNTER DAEMON - CONFIGURATION TEMPLATE
+# ==========================================================
+
+app:
+  # The directory where prompts.yaml and templates are stored
+  active_workspace: "workspaces/cv_outreach"
+  # Delay between full search cycles (seconds)
+  cycle_sleep_sec: 3600
+  # Delay after a cycle encounter a non-fatal error (seconds)
+  error_sleep_sec: 60
+
+pipeline:
+  # Maximum depth of recursive link exploration
+  max_depth: 3
+  # Maximum number of branch links followed per page
+  max_leafs: 4
+  # Context window for link history (characters)
+  max_path_chars: 10000
+  # Max characters of page text sent to LLM for evaluation
+  max_observation_chars: 16000
+  # Heuristic pruning: Skip these domains entirely
+  junk_domains:
+    - linkedin.com
+    - reddit.com
+    - indeed.com
+    - glassdoor.com
+    - upwork.com
+    - github.com
+    - facebook.com
+    - twitter.com
+    - instagram.com
+
+database:
+  # Filename for the SQLite database (saved within the workspace)
+  db_path: "leads_intelligence.db"
+
+gcp:
+  # The remote port Ollama is listening on (default 11434)
+  default_port: 11434
+  # Seconds to wait for OS to settle after GCP 'RUNNING' status
+  boot_settle_time_sec: 15
+  # Seconds to wait for gcloud IAP tunnel to establish
+  tunnel_warmup_sec: 8
+  # Max retries for the initial model VRAM load
+  api_max_retries: 20
+  # Delay between API availability checks (seconds)
+  api_poll_delay_sec: 10
+
+llm:
+  # The Ollama model tag to use (e.g., qwen2.5:32b, llama3.1:70b)
+  model_name: "qwen2.5:32b"
+  # Name of the signatures file in the workspace
+  prompts_path: "prompts.yaml"
+  # Creativity control: 0.0 is deterministic, 1.0 is creative
+  temperature: 0.2
+  # Diversity control (Nucleus sampling)
+  top_p: 0.5
+  # The context window size for the LLM
+  num_ctx: 16384
+  # Prevents repetitive phrases
+  repeat_penalty: 1.1
+  # For reproducible results
+  seed: 42
+
+browser:
+  # Run without a visible window (recommended for production)
+  headless: true
+  # Page load timeout (milliseconds)
+  timeout_ms: 30000
+
+search:
+  # Geography/Vertical pruning: Ignore results from these TLDs
+  blocked_tlds:
+    - .cn
+    - .ru
+    - .de
+    - .fr
+    - .es
+    - .it
+    - .in
+    - .br
+    - .edu
+    - .gov
+    - .ac.uk
+  # Delay between DuckDuckGo queries to prevent IP rate-limiting
+  request_delay_sec: 5
+
+visualizer:
+  # Name of the output HTML file for the Spider Graph
+  output_file: "spider_graph.html"
+
+email:
+  # The SMTP server for your provider (e.g., smtp.gmail.com)
+  smtp_host: "smtp.gmail.com"
+  # SMTP port (587 for STARTTLS)
+  smtp_port: 587
+  # Frequency of processing the outreach queue (seconds)
+  queue_process_interval_sec: 900
+  # Email body template file in the workspace
+  template_path: "email_template.txt"
+
+telegram:
+  # Frequency of checking for user commands
+  poll_interval_sec: 2
+  # Timeout for the Telegram long-polling request
+  poll_timeout_sec: 30

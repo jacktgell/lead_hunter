@@ -1,9 +1,10 @@
 import json
 import time
+import random
 from urllib.parse import urlparse
 from typing import List, Tuple, Dict, Any, Final
 
-from duckduckgo_search import DDGS
+from ddgs import DDGS  # Updated to fix the RuntimeWarning
 from core.interfaces import ISearchEngine
 from core.config import SearchConfig
 from core.logger import get_logger
@@ -21,11 +22,23 @@ class SearchConstants:
     FETCH_MULTIPLIER: Final[int] = 2
     HREF_KEY: Final[str] = "href"
 
+    # NEW: Hardcoded firewall against Asian Q&A forums
+    ASIAN_FORUM_FIREWALL: Final[
+        str] = "-site:zhihu.com -site:baidu.com -site:csdn.net -site:chiebukuro.yahoo.co.jp -site:sohu.com"
+
+    # NEW: Comprehensive list of premium, English-friendly business regions
+    GLOBAL_REGIONS: Final[List[str]] = [
+        "us-en", "ca-en", "uk-en", "ie-en", "au-en", "nz-en",  # West/Oceania
+        "sg-en", "my-en", "th-en", "ph-en", "id-en",  # Southeast Asia
+        "ae-en", "qa-en", "sa-en",  # Middle East
+        "za-en", "hk-en"  # Emerging/Other
+    ]
+
 
 class DuckDuckGoSearch(ISearchEngine):
     """
     Concrete implementation of the ISearchEngine interface using DuckDuckGo.
-    Handles rate-limiting, strict domain filtering, and safe result extraction.
+    Handles rate-limiting, strict domain filtering, safe result extraction, and global routing.
     """
 
     def __init__(self, config: SearchConfig) -> None:
@@ -45,7 +58,13 @@ class DuckDuckGoSearch(ISearchEngine):
         Returns:
             List[str]: A list of clean, absolute URLs matching the query.
         """
-        logger.info(f"Executing search query: {query}")
+        # 1. Programmatically inject the negative constraints
+        safe_query = f"{query} {SearchConstants.ASIAN_FORUM_FIREWALL}"
+
+        # 2. Pick a random premium region for this specific search
+        target_region = random.choice(SearchConstants.GLOBAL_REGIONS)
+
+        logger.info(f"Executing search query in region [{target_region}]: {safe_query}")
         valid_urls: List[str] = []
 
         try:
@@ -53,10 +72,11 @@ class DuckDuckGoSearch(ISearchEngine):
             fetch_limit = num_results * SearchConstants.FETCH_MULTIPLIER
 
             with DDGS() as ddgs:
-                results = ddgs.text(query, max_results=fetch_limit)
+                # 3. Pass the region directly into the DDGS backend
+                results = ddgs.text(safe_query, region=target_region, max_results=fetch_limit)
 
                 if not results:
-                    logger.warning(f"Search yielded no results for query: {query}")
+                    logger.warning(f"Search yielded no results for query: {safe_query}")
                     return []
 
                 for result in results:
@@ -73,7 +93,7 @@ class DuckDuckGoSearch(ISearchEngine):
         except Exception as e:
             # We catch generic exceptions here because the DDGS library can throw
             # unpredictable HTTP errors, Timeout errors, or JSON decoding errors.
-            logger.error(f"Search engine execution failed for query '{query}': {str(e)}", exc_info=True)
+            logger.error(f"Search engine execution failed for query '{safe_query}': {str(e)}", exc_info=True)
             # Returning an empty list ensures the broader pipeline continues to the next query
             return []
 

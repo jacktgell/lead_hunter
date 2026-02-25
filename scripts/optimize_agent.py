@@ -74,7 +74,7 @@ class TrainingDataFactory:
         current_date = datetime.now().strftime("%B %Y")
 
         # Contextual grounding for the optimizer
-        cv_context = "Senior Data Scientist/Engineer: Expert in Python, GCP, and LLM orchestration."
+        cv_context = "Data Scientist/Engineer: Expert in Python, GCP, and LLM orchestration."
         intent = "Find high-growth AI startups and fractional consulting opportunities."
 
         return [

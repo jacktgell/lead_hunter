@@ -22,11 +22,9 @@ class SearchConstants:
     FETCH_MULTIPLIER: Final[int] = 2
     HREF_KEY: Final[str] = "href"
 
-    # NEW: Hardcoded firewall against Asian Q&A forums
     ASIAN_FORUM_FIREWALL: Final[
         str] = "-site:zhihu.com -site:baidu.com -site:csdn.net -site:chiebukuro.yahoo.co.jp -site:sohu.com"
 
-    # NEW: Comprehensive list of premium, English-friendly business regions
     GLOBAL_REGIONS: Final[List[str]] = [
         "us-en", "ca-en", "uk-en", "ie-en", "au-en", "nz-en",  # West/Oceania
         "sg-en", "my-en", "th-en", "ph-en", "id-en",  # Southeast Asia

@@ -53,7 +53,6 @@ class DspyOllamaLLM(ILLMProvider):
             top_p=self.config.top_p,
             timeout=120.0,
             num_ctx=self.config.num_ctx,
-            seed=self.config.seed,
             repeat_penalty=self.config.repeat_penalty
         )
         dspy.settings.configure(lm=self.lm)

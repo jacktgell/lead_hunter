@@ -1,4 +1,5 @@
 import os
+import re
 import threading
 from typing import List, Any, Final, Optional
 
@@ -80,6 +81,7 @@ class PlaywrightBrowser(IWebBrowser):
         """
         Navigates to a URL, waits for DOM content, strips noise, and returns raw text.
         Includes a language guard to ignore non-English pages.
+        Aggressively pre-extracts emails via Regex to guarantee the LLM sees them.
         """
         browser = self._get_browser()
         page = browser.new_page()
@@ -87,12 +89,30 @@ class PlaywrightBrowser(IWebBrowser):
         try:
             page.goto(url, wait_until="domcontentloaded", timeout=self.timeout)
 
+            # 1. Grab raw HTML before the DOM cleaner destroys potentially useful mailto links
+            raw_html = page.content()
+
+            # 2. Aggressive Regex Email Extraction
+            email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+            found_emails = list(set(re.findall(email_pattern, raw_html)))
+
+            # Filter out common false positives (image extensions, generic domains, tracking emails)
+            ignore_list = (
+                '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp',
+                'sentry.io', 'example.com', 'yourdomain.com'
+            )
+            clean_emails = [
+                e for e in found_emails
+                if not e.lower().endswith(ignore_list) and not e.startswith(('u00', '12345'))
+            ]
+
+            # 3. Clean the DOM to remove noise and save LLM context tokens
             llm_friendly_text = str(page.evaluate(BrowserConstants.DOM_CLEANER_JS))
 
             if not llm_friendly_text.strip():
                 return ""
 
-            # Language Guard
+            # 4. Language Guard
             try:
                 lang = detect(llm_friendly_text)
                 if lang != BrowserConstants.TARGET_LANGUAGE:
@@ -100,6 +120,11 @@ class PlaywrightBrowser(IWebBrowser):
                     return ""
             except Exception as e:
                 logger.debug(f"Language detection failed for {url}. Proceeding. Error: {str(e)}")
+
+            # 5. Inject the high-confidence emails at the very top of the LLM prompt
+            if clean_emails:
+                header = f"--- HIGH CONFIDENCE EMAILS FOUND ON PAGE: {', '.join(clean_emails)} ---\n\n"
+                llm_friendly_text = header + llm_friendly_text
 
             return llm_friendly_text
 

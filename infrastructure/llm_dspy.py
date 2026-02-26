@@ -36,7 +36,8 @@ class DspyOllamaLLM(ILLMProvider):
         # Initialize DSPy Predictors (DSPy 2.5+ Native Pydantic Support)
         self.query_generator = dspy.Predict(GenerateSearchQueriesSignature)
         self.page_evaluator = dspy.Predict(EvaluateWebpageSignature)
-        self.outreach_drafter = dspy.Predict(DraftOutreachSignature)
+
+        #self.outreach_drafter = dspy.Predict(DraftOutreachSignature)
 
         self._load_optimizer_weights()
 

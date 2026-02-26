@@ -28,13 +28,6 @@ class SearchConstants:
         "chiebukuro.yahoo.co.jp", "sohu.com"
     )
 
-    GLOBAL_REGIONS: Final[List[str]] = [
-        "us-en", "ca-en", "uk-en", "ie-en", "au-en", "nz-en",  # West/Oceania
-        "sg-en", "my-en", "th-en", "ph-en", "id-en",  # Southeast Asia
-        "ae-en", "qa-en", "sa-en",  # Middle East
-        "za-en", "hk-en"  # Emerging/Other
-    ]
-
 
 class DuckDuckGoSearch(ISearchEngine):
     """
@@ -54,9 +47,9 @@ class DuckDuckGoSearch(ISearchEngine):
         """
         safe_query = query
 
-        target_region = random.choice(SearchConstants.GLOBAL_REGIONS)
-
-        logger.info(f"Executing search query in region [{target_region}]: {safe_query}")
+        # Relying on the LLM to inject location text (e.g., "London"),
+        # so we use the worldwide region "wt-wt" to prevent DDG localization conflicts.
+        logger.info(f"Executing global search query [wt-wt]: {safe_query}")
         valid_urls: List[str] = []
 
         try:
@@ -73,7 +66,7 @@ class DuckDuckGoSearch(ISearchEngine):
             with DDGS() as ddgs:
                 results = ddgs.text(
                     safe_query,
-                    region=target_region,
+                    region="wt-wt",  # Enforces a neutral geographic baseline
                     max_results=fetch_limit,
                     backend="api"
                 )
@@ -110,7 +103,7 @@ class DuckDuckGoSearch(ISearchEngine):
         parsed_url = urlparse(url)
         netloc = parsed_url.netloc
 
-        # 🛠️ THE FIREWALL: Pruning bad domains in Python rather than in the search query
+        # THE FIREWALL: Pruning bad domains in Python rather than in the search query
         if netloc.endswith(self._blocked_tlds) or netloc.endswith(SearchConstants.ASIAN_FORUM_FIREWALL):
             logger.debug(f"Search Guard Triggered: Pruning forbidden domain -> {url}")
             return False

@@ -1,16 +1,19 @@
 config:
   target_intent: |
-    Find early-stage startups and product-based companies (SaaS, FinTech, HealthTech, etc.) 
-    that need internal AI development, machine learning expertise, or full-stack Python engineering. 
+    Identify opportunities for a Python/AI Software Engineer. 
+    Target direct product companies (Startups to established giants) 
+    and "Force Multipliers": Tech Recruiting Agencies, Staffing Firms, and Consultancies.
+    Jack is flexible and open to Full-Time, Contract, or Freelance roles.
     
     ANTI-PERSONA (DO NOT TARGET):
-    1. Middlemen: Freelance platforms (Upwork, Toptal), or low-margin "offshore" IT outsourcing agencies looking for cheap labor.
-    2. Academia/Forums: Q&A sites (Zhihu, Baidu Zhidao), StackOverflow, programming tutorials, or research papers.
-    3. Noise: Event ticket aggregators, quote directories, or news syndicators.
+    1. Low-Margin "Offshore" Shops: Generic dev shops looking for $10/hr labor.
+    2. Academia/Forums: Q&A sites (Zhihu, Baidu), Tutorials, or Research papers.
+    3. Noise: Event aggregators, quote directories, or generic job board search results.
     
     TARGET PERSONA (DO TARGET):
-    1. Direct product companies with "Founders", "CTOs", or a core software product that recently raised funding or are hiring internally.
-    2. Premium IT Consulting firms or Systems Integrators looking for specialized AI subcontractors, fractional ML architects, or subject matter experts to fulfill enterprise contracts.
+    1. STARTUPS & PRODUCT GIANTS: Direct companies (Pre-seed to Enterprise) with internal software products. If they use AI or Python, they are a target.
+    2. TECH RECRUITERS & HEADHUNTERS: Specific agency landing pages or consultant profiles in tech hubs. They have the jobs.
+    3. SYSTEMS INTEGRATORS & CONSULTANCIES: Agencies that bid on enterprise contracts and need versatile engineers for their projects.
 
 candidate_profile:
   name: Jack Gell
@@ -85,8 +88,8 @@ templates:
     =========================================
     IMMUTABLE HEADER: MISSION & CANDIDATE
     =========================================
-    MISSION: Find high-value freelance leads for Jack Gell.
-    TARGET AUDIENCE: Early-stage startups / AI & Python development.
+    MISSION: Find Full-Time, Contract, or Freelance opportunities for Jack Gell.
+    TARGET AUDIENCE: Product Companies, Tech Recruiting Agencies, Staffing Firms, & Consultancies.
     CURRENT DATE: {current_date}
     FORBIDDEN: Do not follow ads. No hallucinated emails. No repeat URLs.
 
@@ -108,39 +111,61 @@ templates:
     CONTENT: {page_text}
     
     =========================================
-    EXECUTION TASK (THE JUDGE)
+    EXECUTION TASK (THE STRATEGIC JUDGE)
     =========================================
-    You are Jack Gell's Business Manager. Your goal is to filter out low-value "gig" work 
-    and identify high-value "architectural" or "ML strategy" work directly with product owners or premium consulting partners.
+    You are Jack Gell's Job Search Agent. Your goal is to maximize outreach volume 
+    to any entity that employs, hires, or places Python/AI Engineers.
     
-    1. IDENTITY CHECK: Is this a product company or a premium consultancy? Or is this a low-margin IT Agency/Dev Shop trying to hire cheap labor? (Prune cheap Dev Shops).
-    2. CONTEXT CHECK: Is this a business page? Or is this a blog post, tutorial, Q&A forum, or event listing? (Prune Forums/Tutorials).
-    3. PROFITABILITY: Is this a startup with a budget (pre-Seed/Series A) or an established premium consultancy?
+    1. THE "ESTABLISHED WORKFORCE" RULE: If a site uses Python, AI, Data Science, or Machine Learning, they are a target. 
+       - They do NOT need to have an active job posting. If they have a tech team, Jack can network with them.
     
-    DECISION CRITERIA:
-    - CONVERT: It is a DIRECT product company OR a Premium IT Consultancy looking for senior subcontractors, AND you found a specific email (founder@, ceo@, partners@, firstname@).
-    - FOLLOW: High-quality product company or premium consultancy, AND you found clickable URLs for /team, /about, or /contact.
-    - PRUNE: It is a low-margin Dev Shop, Cheap Outsourcing Agency, Forum, Tutorial, Aggregator, OR technical complexity is too low.
+    2. THE "MULTIPLIER" RULE: If this is a Tech Recruitment Agency or Staffing Firm—they are a high-priority target. 
+       - One email to a recruiter can unlock 5 different client interviews.
+    
+    3. THE "AGENCY" RULE: If it's a Dev Shop or Consultancy, they are a target. 
+       - They constantly need versatile engineers to deliver projects for clients.
+    
+    4. THE "PLATFORM OWNER" ADDENDUM: Distinguish between the "Platform Service" and the "Platform Owner." 
+     - DO PRUNE: A page listing 50 Python jobs for random companies on Bayt (Noise).
+     - DO FOLLOW: A page where Bayt.com itself is hiring an Engineer for their internal team.
+    
+    5. THE "HOME BASE" MANEUVER: If you identify a high-value company name from a job board or third-party site:
+       - Do NOT guess the /careers URL. 
+       - Instead, set decision to FOLLOW and provide the ROOT URL (e.g., https://www.company.com).
+    
+    DECISION CRITERIA (STRICT EMAIL RULE):
+    - CONVERT: The company is a match AND an email address is visible on the page (e.g., Founder, HR, careers@, info@).
+    - FOLLOW: The company is a match, but NO EMAIL is visible. Extract links like /contact, /about, /team, or /careers to hunt for the email.
+    - PRUNE: Strictly limited to personal blogs, tutorials, research papers, or generic job board search results.
+    
+    CRITICAL INSTRUCTION: When in doubt, EXPAND. If a company operates in the tech space, they are a potential employer or partner.
 
   qualification_override: |
-    [CRITICAL OVERRIDE FOR QUALIFICATION]
-    Do NOT be overly strict. We are casting a wider net. 
-    If the company or individual would reasonably be impressed by the candidate's background 
-    and has the potential to hire them, work with them, or benefit from their skills, 
-    you MUST aggressively extract any available email addresses decide the most appropriate one and choose the 'CONVERT' decision. 
-    Err heavily on the side of CONVERT if an email is present.
+    [CRITICAL OVERRIDE: WIDEN THE NET]
+    Do NOT prune established product companies or startups just because they don't have an active job posting. 
+    If they are a tech company, they are a valid networking target for Jack's job search.
+    If an email exists, CONVERT. If no email exists, FOLLOW to find one.
 
   meta_prompt: |
-    You are an expert prompt engineer and OSINT recruiter. Analyze the candidate and target intent.
-    Write a RAW instruction prompt for a search AI.
+    You are an OSINT Tech Recruitment Sourcer. 
+    Your mission is to generate search queries that find job opportunities, tech recruiters, and software agencies for Jack Gell.
     
-    CANDIDATE: 
-    {cv_context}
+    CANDIDATE STRENGTHS TO LEVERAGE:
+    - High-end Python/ML Architecture (Neurakinetic).
+    - End-to-end GCP/Data Infrastructure (FinRev).
+    - Technical Consultancy for Pharma/Finance/Gov (PA Consulting).
     
-    TARGET: 
-    {user_prompt}
+    SEARCH STRATEGY:
+    1. THE "TALENT GAP" SIGNAL: Search for companies hiring for "Python" or "AI" roles. 
+    2. THE "FORCE MULTIPLIER": Find specialized tech recruitment and staffing firms in Singapore, Dubai, and London.
+    3. THE "TECH ECOSYSTEM": Target established tech companies, data consultancies, and software agencies.
     
-    RULES: Focus on "Hidden Job Market" and freelance/contractor intent.
+    OUTPUT INSTRUCTIONS:
+    Write 10 RAW DuckDuckGo queries. 
+    - No 'site:' operators.
+    - Use Boolean AND/OR.
+    - Use geographic hubs (Riyadh, Singapore, London, NYC, etc).
+    - Focus on "Hiring", "About Us", "Team", and "Careers" footprints.
 
   execution_prompt: |
     Strategy: 
@@ -149,13 +174,8 @@ templates:
     Generate exactly 10 diverse DuckDuckGo search queries.
     
     SYNTAX AND TARGETING RULES:
-    1. GEOGRAPHIC ANCHOR: You MUST include a major global tech hub or country in EVERY query to force high-quality, local business results. Mix and match from these regions across your 10 queries:
-       - Southeast Asia: "Singapore", "Kuala Lumpur", "Bangkok", "Thailand", "Malaysia"
-       - Middle East: "Dubai", "Abu Dhabi", "Riyadh", "UAE", "Qatar"
-       - North America: "San Francisco", "New York", "Austin", "Toronto", "Seattle"
-       - Europe/UK: "London", "Berlin", "Amsterdam", "Stockholm", "Zurich"
-       - Oceania: "Sydney", "Melbourne", "Brisbane"
-    2. LANGUAGE: Target English-language business pages only. (Strictly avoid Chinese/Japanese terms to prevent forum spam).
-    3. BOOLEAN: Use Boolean logic and "quotes" for exact phrases (e.g., "HealthTech startup" AND "Founders" AND "Singapore").
-    4. LENGTH: Maximum 8 words per query.
-    5. FORBIDDEN: Do not use 'site:' operators. Do not use generic programming terms without a business context.
+    1. GEOGRAPHIC ANCHOR: Include a major hub in EVERY query (Singapore, Dubai, London, NYC, Austin, Riyadh, Thailand, Malaysia, Australia).
+    2. MULTIPLIER SEARCH: 30% of queries MUST target recruiters (e.g., "Tech recruitment agency" AND "AI" AND "London").
+    3. DIRECT ROLE SEARCH: 40% of queries MUST target hiring intent (e.g., "Software Engineer" AND "hiring" AND "Singapore").
+    4. ECOSYSTEM SEARCH: 30% of queries MUST target tech companies/consultancies (e.g., "AI consultancy" AND "team" AND "Dubai").
+    5. FORBIDDEN: Do not use 'site:' operators. Max 8 words. No generic programming terms.

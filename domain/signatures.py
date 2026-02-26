@@ -33,11 +33,11 @@ class WebpageEvaluation(BaseModel):
     )
     email: Optional[str] = Field(
         default=None,
-        description="Exact email address found (e.g., info@, contact@). If found, decision MUST be CONVERT."
+        description="Exact email address found. If NO email is found, output null/None. Do NOT hallucinate."
     )
     reason: str = Field(
         default="",
-        description="States if this is a FULL-TIME or FREELANCE opportunity, and why it fits the candidate."
+        description="States if this is a FULL-TIME, FREELANCE, or AGENCY PARTNERSHIP opportunity."
     )
 
 
@@ -54,13 +54,15 @@ class SearchQueries(BaseModel):
 
 class GenerateSearchQueriesSignature(dspy.Signature):
     """
-    <system>You are an expert AI Lead Generation Specialist and Technical Recruiter.</system>
+    <system>You are an expert OSINT Hunter and Tech Recruiter.</system>
     <instruction>
-    Generate diverse DuckDuckGo search queries using Boolean logic (DO NOT use 'site:' operators).
-    Your goal is a dual-track hunt:
-    1. Find companies actively hiring full-time AI/Python engineers.
-    2. Find early-stage startups that lack AI talent and need freelance/consulting expertise.
-    Output queries that will uncover BOTH types of opportunities based on the <context>.
+    Generate 10 diverse DuckDuckGo search queries using Boolean logic.
+    STRATEGY:
+    - 30% Multiplier Search: Target Tech Recruitment Agencies + AI + Hubs (Singapore/London/Dubai).
+    - 40% Broad Tech Search: Target established tech companies, startups, and software agencies + Hubs.
+    - 30% Job Search: Target general hiring intent for Python/Data/AI + Hubs.
+
+    ANCHORING: Every query MUST include a tech hub (e.g., "Singapore", "Riyadh", "London", "NYC").
     </instruction>
     """
     cv_context: str = dspy.InputField(desc="The candidate's resume and background enclosed in <context> tags.")
@@ -72,27 +74,29 @@ class GenerateSearchQueriesSignature(dspy.Signature):
 
 class EvaluateWebpageSignature(dspy.Signature):
     """
-    <system>You are a ruthless Lead Qualification Engine and Data Extractor.</system>
+    <system>You are a highly adaptable AI/Tech Recruitment Matchmaker.</system>
     <instruction>
-    Evaluate the provided scraped webpage to determine if this is a high-value opportunity.
+    Evaluate the webpage to identify if this company is a match for Jack Gell.
+    We are casting a WIDE NET. Jack is open to Full-Time roles, Contract work, Freelance projects, or Agency representation.
 
-    CRITICAL PRUNING RULES (IMMEDIATE REJECTION):
-    - If the page is a Q&A forum (like Zhihu, Quora, StackOverflow), PRUNE.
-    - If the page is a software development agency, IT consulting firm, or freelance marketplace offering services to others, PRUNE.
-    - If the page is a tutorial, event listing, or quote directory, PRUNE.
+    EXPANSION RULES (DO NOT PRUNE):
+    - DO NOT PRUNE staffing firms, tech recruiters, or software agencies. They are highly valuable force multipliers.
+    - DO NOT PRUNE established tech companies or startups just because they don't have an active job posting right now. If they have an established AI/Python workforce, they are a valid networking target.
 
-    OPPORTUNITY VALIDATION:
-    An opportunity is ONLY valid if it is a direct product company, SaaS, or startup that needs AI/Python architecture for their own internal product.
+    NAVIGATION STRATEGY (STOP HALLUCINATING URLS):
+    1. If you are on a Job Board or LinkedIn profile and identify a tech company:
+       - DO NOT guess their sub-pages (e.g. don't guess /careers).
+       - Instead, set decision to FOLLOW and provide the ROOT DOMAIN (e.g. https://company.com).
+    2. If you are already on the company's website:
+       - ONLY FOLLOW links that are actually visible in the provided content.
 
-    EXTRACTION RULES:
-    1. Look deeply for ANY email addresses. Prefer founder@, ceo@, or specific names (e.g., john@).
-    2. Treat info@, support@, and contact@ with skepticism. Only CONVERT on these if the company is definitively a small startup.
-    3. If you find a valid email AND the company is a direct product match, set decision to CONVERT immediately.
-    4. Set decision to FOLLOW only to navigate to 'Contact', 'About', or 'Team' pages of validated product companies.
-
-    TEMPORAL CHECK: You must compare dates against `current_date`. If a job posting or news article is older than 6 months, PRUNE.
+    EXTRACTION & CONVERSION (STRICT EMAIL RULE):
+    1. YOU MUST HAVE AN EMAIL TO CONVERT. If you find a human email (Founder, HR, CTO) or generic email (careers@, info@) AND the company is a match, set decision to CONVERT.
+    2. If the company is a match but NO EMAIL is visible on the current page, set decision to FOLLOW and extract target URLs like /contact, /about, /team, or /careers to hunt for the email.
+    3. PRUNE ONLY non-business noise (Tutorials, Forums, Personal blogs).
     </instruction>
     """
+
     cv_context: str = dspy.InputField()
     target_intent: str = dspy.InputField()
     current_date: str = dspy.InputField(desc="The current actual month and year.")
@@ -105,17 +109,19 @@ class EvaluateWebpageSignature(dspy.Signature):
 
 class DraftOutreachSignature(dspy.Signature):
     """
-    <system>You are an elite B2B Technical Sales Executive and Executive Candidate.</system>
+    <system>You are a highly capable, pragmatic AI/Python Software Engineer reaching out for opportunities.</system>
     <instruction>
-    Draft a concise, high-impact outreach email mapping the company's needs to the candidate's specific background.
-    CRITICAL: You must adapt your tone based on the context.
-    - If they are actively hiring for a role, position this as a direct application to the Hiring Manager.
-    - If there is no job posting, position this as a high-value freelance/consulting pitch to the Founder.
-    No fluff, no pleasantries outside the email body. Get straight to the technical value proposition.
+    Draft a concise, professional outreach email mapping the company's domain to the candidate's background.
+    CRITICAL: Jack is highly flexible and looking for the right team or project.
+    - Tone: Confident, approachable, and eager to contribute. Do NOT sound like an aggressive salesman.
+    - If they are actively hiring: Position as a direct, strong candidate for the team.
+    - If they are an agency/recruiter: Position as a versatile asset available for their clients (contract or full-time).
+    - If there is no job posting: Send a brief networking inquiry asking if they use external contractors or are planning to expand their Python/Data team soon.
+    Get straight to the point without fluffy pleasantries.
     </instruction>
     """
     cv_context: str = dspy.InputField()
-    founder_name: str = dspy.InputField(desc="The name of the target contact (Founder or Hiring Manager).")
+    founder_name: str = dspy.InputField(desc="The name of the target contact (Founder, HR, or Hiring Manager).")
     company_name: str = dspy.InputField()
 
     email_draft: str = dspy.OutputField(desc="The raw email text.")

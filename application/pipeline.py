@@ -196,10 +196,11 @@ class LeadGenerationPipeline:
             person = str(data.get('person', PipelineConstants.DEFAULT_NA)).strip()
 
             if not email or "@" not in email:
-                raise LeadExtractionError(f"Invalid email: {email}")
+                logger.warning(f"Qualified lead missing email: {company}. Flagging for enrichment.")
+                email = f"NEEDS_ENRICHMENT@{company.replace(' ', '').lower()}.com"
 
             with self._db_lock:
-                if self.db.is_email_contacted(email):
+                if self.db.is_email_contacted(email) and "NEEDS_ENRICHMENT" not in email:
                     self.tracker.update_node(url, NodeState.SKIP, "Already Contacted")
                     return []
 

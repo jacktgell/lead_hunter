@@ -1,18 +1,28 @@
 config:
+  target_locations:
+    - Singapore
+    - London
+    - Dubai
+    - Thailand
+    - Malaysia
+    - Remote
+
   target_intent: |
     Identify opportunities for a Python/AI Software Engineer. 
     Target direct product companies (Startups to established giants) 
     and "Force Multipliers": Tech Recruiting Agencies, Staffing Firms, and Consultancies.
     Jack is flexible and open to Full-Time, Contract, or Freelance roles.
     
+    GEOGRAPHIC FOCUS: Must target these specific locations: {locations}.
+    
     ANTI-PERSONA (DO NOT TARGET):
     1. Low-Margin "Offshore" Shops: Generic dev shops looking for $10/hr labor.
-    2. Academia/Forums: Q&A sites (Zhihu, Baidu), Tutorials, or Research papers.
+    2. Academia/Forums: Q&A sites, Tutorials, or Research papers.
     3. Noise: Event aggregators, quote directories, or generic job board search results.
     
     TARGET PERSONA (DO TARGET):
     1. STARTUPS & PRODUCT GIANTS: Direct companies (Pre-seed to Enterprise) with internal software products. If they use AI or Python, they are a target.
-    2. TECH RECRUITERS & HEADHUNTERS: Specific agency landing pages or consultant profiles in tech hubs. They have the jobs.
+    2. TECH RECRUITERS & HEADHUNTERS: Specific agency landing pages or consultant profiles in our target tech hubs ({locations}). They have the jobs.
     3. SYSTEMS INTEGRATORS & CONSULTANCIES: Agencies that bid on enterprise contracts and need versatile engineers for their projects.
 
 candidate_profile:
@@ -82,100 +92,3 @@ candidate_profile:
       focus: Deep Learning, NLP, Reinforcement Learning
     - degree: BEng Robotic Engineering
       institution: University of Plymouth
-
-templates:
-  mission_header: |
-    =========================================
-    IMMUTABLE HEADER: MISSION & CANDIDATE
-    =========================================
-    MISSION: Find Full-Time, Contract, or Freelance opportunities for Jack Gell.
-    TARGET AUDIENCE: Product Companies, Tech Recruiting Agencies, Staffing Firms, & Consultancies.
-    CURRENT DATE: {current_date}
-    FORBIDDEN: Do not follow ads. No hallucinated emails. No repeat URLs.
-
-    CANDIDATE:
-    {cv_context}
-
-  detective_prompt: |
-    {mission_header}
-    
-    =========================================
-    INVESTIGATIVE PATHWAY (AGENT MEMORY)
-    =========================================
-    {memory_buffer}
-    
-    =========================================
-    CURRENT OBSERVATION (SCOUT REPORT)
-    =========================================
-    URL: {url}
-    CONTENT: {page_text}
-    
-    =========================================
-    EXECUTION TASK (THE STRATEGIC JUDGE)
-    =========================================
-    You are Jack Gell's Job Search Agent. Your goal is to maximize outreach volume 
-    to any entity that employs, hires, or places Python/AI Engineers.
-    
-    1. THE "ESTABLISHED WORKFORCE" RULE: If a site uses Python, AI, Data Science, or Machine Learning, they are a target. 
-       - They do NOT need to have an active job posting. If they have a tech team, Jack can network with them.
-    
-    2. THE "MULTIPLIER" RULE: If this is a Tech Recruitment Agency or Staffing Firm—they are a high-priority target. 
-       - One email to a recruiter can unlock 5 different client interviews.
-    
-    3. THE "AGENCY" RULE: If it's a Dev Shop or Consultancy, they are a target. 
-       - They constantly need versatile engineers to deliver projects for clients.
-    
-    4. THE "PLATFORM OWNER" ADDENDUM: Distinguish between the "Platform Service" and the "Platform Owner." 
-     - DO PRUNE: A page listing 50 Python jobs for random companies on Bayt (Noise).
-     - DO FOLLOW: A page where Bayt.com itself is hiring an Engineer for their internal team.
-    
-    5. THE "HOME BASE" MANEUVER: If you identify a high-value company name from a job board or third-party site:
-       - Do NOT guess the /careers URL. 
-       - Instead, set decision to FOLLOW and provide the ROOT URL (e.g., https://www.company.com).
-    
-    DECISION CRITERIA (STRICT EMAIL RULE):
-    - CONVERT: The company is a match AND an email address is visible on the page (e.g., Founder, HR, careers@, info@).
-    - FOLLOW: The company is a match, but NO EMAIL is visible. Extract links like /contact, /about, /team, or /careers to hunt for the email.
-    - PRUNE: Strictly limited to personal blogs, tutorials, research papers, or generic job board search results.
-    
-    CRITICAL INSTRUCTION: When in doubt, EXPAND. If a company operates in the tech space, they are a potential employer or partner.
-
-  qualification_override: |
-    [CRITICAL OVERRIDE: WIDEN THE NET]
-    Do NOT prune established product companies or startups just because they don't have an active job posting. 
-    If they are a tech company, they are a valid networking target for Jack's job search.
-    If an email exists, CONVERT. If no email exists, FOLLOW to find one.
-
-  meta_prompt: |
-    You are an OSINT Tech Recruitment Sourcer. 
-    Your mission is to generate search queries that find job opportunities, tech recruiters, and software agencies for Jack Gell.
-    
-    CANDIDATE STRENGTHS TO LEVERAGE:
-    - High-end Python/ML Architecture (Neurakinetic).
-    - End-to-end GCP/Data Infrastructure (FinRev).
-    - Technical Consultancy for Pharma/Finance/Gov (PA Consulting).
-    
-    SEARCH STRATEGY:
-    1. THE "TALENT GAP" SIGNAL: Search for companies hiring for "Python" or "AI" roles. 
-    2. THE "FORCE MULTIPLIER": Find specialized tech recruitment and staffing firms in Singapore, Dubai, and London.
-    3. THE "TECH ECOSYSTEM": Target established tech companies, data consultancies, and software agencies.
-    
-    OUTPUT INSTRUCTIONS:
-    Write 10 RAW DuckDuckGo queries. 
-    - No 'site:' operators.
-    - Use Boolean AND/OR.
-    - Use geographic hubs (Riyadh, Singapore, London, NYC, etc).
-    - Focus on "Hiring", "About Us", "Team", and "Careers" footprints.
-
-  execution_prompt: |
-    Strategy: 
-    {dynamic_instructions}
-    
-    Generate exactly 10 diverse DuckDuckGo search queries.
-    
-    SYNTAX AND TARGETING RULES:
-    1. GEOGRAPHIC ANCHOR: Include a major hub in EVERY query (Singapore, Dubai, London, NYC, Austin, Riyadh, Thailand, Malaysia, Australia).
-    2. MULTIPLIER SEARCH: 30% of queries MUST target recruiters (e.g., "Tech recruitment agency" AND "AI" AND "London").
-    3. DIRECT ROLE SEARCH: 40% of queries MUST target hiring intent (e.g., "Software Engineer" AND "hiring" AND "Singapore").
-    4. ECOSYSTEM SEARCH: 30% of queries MUST target tech companies/consultancies (e.g., "AI consultancy" AND "team" AND "Dubai").
-    5. FORBIDDEN: Do not use 'site:' operators. Max 8 words. No generic programming terms.

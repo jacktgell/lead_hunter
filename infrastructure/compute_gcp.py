@@ -56,13 +56,6 @@ class GcpOllamaManager(IComputeManager):
     def ensure_infrastructure_ready(self) -> str:
         """
         Orchestrates the verification and provisioning of the GCP environment.
-
-        Returns:
-            str: The strictly formatted IPv4 local host URL for the tunneled API.
-
-        Raises:
-            GcpInfrastructureError: If the instance fails to boot.
-            TunnelConnectionError: If the tunnel cannot be established.
         """
         logger.info(f"Verifying GCP instance: {self.config.instance_name} in {self.config.zone}")
 
@@ -70,9 +63,10 @@ class GcpOllamaManager(IComputeManager):
         self._ensure_iap_firewall_rule()
         self._ensure_instance_tags(instance)
 
+        self._authenticate_gcloud_cli()
+
         self.active_local_port = self._establish_iap_tunnel()
 
-        # Strict IPv4 enforcement to bypass OS-level IPv6 'localhost' resolution inconsistencies
         host_url = f"http://{GcpConstants.LOCAL_BIND_IP}:{self.active_local_port}"
         self._wait_for_ollama(host_url)
 
@@ -295,3 +289,31 @@ class GcpOllamaManager(IComputeManager):
             logger.info("Instance shutdown command acknowledged.")
         except Exception as e:
             logger.error(f"Failed to dispatch shutdown command: {str(e)}", exc_info=True)
+
+    def _authenticate_gcloud_cli(self) -> None:
+        """Silently authenticates the gcloud subprocess using the Service Account."""
+        cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+        if not cred_path or not os.path.exists(cred_path):
+            logger.warning("GOOGLE_APPLICATION_CREDENTIALS not found. Relying on default gcloud auth.")
+            return
+
+        logger.info("Authenticating gcloud CLI via Service Account...")
+        gcloud_cmd = "gcloud.cmd" if os.name == 'nt' else "gcloud"
+
+        cmd = [
+            gcloud_cmd, "auth", "activate-service-account",
+            f"--key-file={cred_path}",
+            "--quiet"
+        ]
+
+        # Hide the console window on Windows
+        kwargs = {'stdout': subprocess.DEVNULL, 'stderr': subprocess.PIPE}
+        if os.name == 'nt':
+            kwargs['creationflags'] = getattr(subprocess, 'CREATE_NO_WINDOW', 0x08000000)
+
+        try:
+            result = subprocess.run(cmd, check=True, **kwargs)
+        except subprocess.CalledProcessError as e:
+            error_msg = e.stderr.decode('utf-8').strip() if e.stderr else "Unknown error."
+            raise GcpInfrastructureError(f"Failed to authenticate gcloud CLI: {error_msg}")

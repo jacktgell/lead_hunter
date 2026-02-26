@@ -165,11 +165,16 @@ def _inject_user_intent(yaml_data: Dict[str, Any]) -> Dict[str, Any]:
     with open(prompts_full_path, "r", encoding="utf-8") as pf:
         try:
             prompts_data = yaml.safe_load(pf) or {}
-            target_intent = prompts_data['config']['target_intent'].strip()
+            locations_list = prompts_data.get('config', {}).get('target_locations', [])
+            locations_str = ", ".join(locations_list) if locations_list else "Global / Remote"
+
+            raw_intent = prompts_data['config']['target_intent'].strip()
+            target_intent = raw_intent.format(locations=locations_str)
 
             app_data = yaml_data.setdefault('app', {})
             app_data['user_intent'] = target_intent
-            logger.debug("Successfully injected user_intent from prompts file.")
+            logger.debug(f"Successfully injected locations ({locations_str}) into user_intent.")
+
         except KeyError as e:
             raise ConfigurationError(f"Workspace prompts file ({prompts_full_path}) is missing required key: {e}")
         except yaml.YAMLError as e:

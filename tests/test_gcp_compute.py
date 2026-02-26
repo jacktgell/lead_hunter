@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 from infrastructure.compute_gcp import GcpOllamaManager
 from core.config import GcpConfig
-
+from infrastructure.compute_gcp import GcpInfrastructureError
 
 class TestGcpComputeLifecycle(unittest.TestCase):
     def setUp(self):
@@ -31,7 +31,7 @@ class TestGcpComputeLifecycle(unittest.TestCase):
         # Fix: Mock time.sleep to raise an error to break the loop efficiently
         # OR mock time.time to simulate passage of time
         with patch("time.time", side_effect=[100, 100, 100, 5000]):
-            with self.assertRaises(TimeoutError):
+            with self.assertRaises(GcpInfrastructureError):
                 self.manager.ensure_infrastructure_ready()
 
     @patch("requests.get")

@@ -58,16 +58,16 @@ class GenerateSearchQueriesSignature(dspy.Signature):
     <instruction>
     Generate 10 diverse DuckDuckGo search queries using Boolean logic.
     STRATEGY:
-    - 30% Multiplier Search: Target Tech Recruitment Agencies + AI + Hubs (Singapore/London/Dubai).
-    - 40% Broad Tech Search: Target established tech companies, startups, and software agencies + Hubs.
-    - 30% Job Search: Target general hiring intent for Python/Data/AI + Hubs.
+    - 30% Multiplier Search: Target Tech Recruitment Agencies + AI.
+    - 40% Broad Tech Search: Target established tech companies, startups, and software agencies.
+    - 30% Job Search: Target general hiring intent for Python/Data/AI.
 
-    ANCHORING: Every query MUST include a tech hub (e.g., "Singapore", "Riyadh", "London", "NYC").
+    ANCHORING: Every single query MUST include one of the specific geographic locations provided in the target_intent.
     </instruction>
     """
     cv_context: str = dspy.InputField(desc="The candidate's resume and background enclosed in <context> tags.")
     target_intent: str = dspy.InputField(
-        desc="The specific types of companies or jobs we are hunting for enclosed in <context> tags.")
+        desc="The specific types of companies or jobs we are hunting for enclosed in <context> tags. This contains the required geographic locations.")
 
     output: SearchQueries = dspy.OutputField()
 

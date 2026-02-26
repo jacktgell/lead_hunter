@@ -40,6 +40,7 @@ class TestAuxiliarySystems(unittest.TestCase):
 
             # Inject existing node state into the mock network
             vis.net.nodes = [{'id': 'A', 'color': 'blue'}]
+            vis._node_registry.add('A')
 
             # Try to add 'A' again with a new color
             vis.add_node("A", "Label", "red")

@@ -5,6 +5,8 @@ from core.interfaces import ITelegramService
 from core.config import TelegramConfig
 from core.logger import get_logger
 
+import time
+
 logger = get_logger(__name__)
 
 
@@ -82,7 +84,13 @@ class TelegramService(ITelegramService):
         except requests.exceptions.Timeout:
             # Expected behavior during long polling
             return []
+        except requests.exceptions.ConnectionError as e:
+            # Cleanly handle internet drops/resets without polluting logs with a stack trace
+            logger.warning(f"Telegram connection reset by peer. Pausing 5s before reconnecting.")
+            time.sleep(5)
+            return []
         except Exception as e:
+            # Only print massive stack traces for truly unexpected fatal errors
             logger.error(f"Telegram command polling failed: {str(e)}", exc_info=True)
             return []
 

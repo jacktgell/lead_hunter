@@ -1,11 +1,7 @@
 config:
   target_locations:
-    - Singapore
-    - London
-    - Dubai
     - Thailand
     - Malaysia
-    - Remote
 
   target_intent: |
     Identify opportunities for a Python/AI Software Engineer. 

@@ -59,9 +59,11 @@ class TelegramBotWorker(threading.Thread):
 
                     user_text = str(message["text"]).strip()
                     logger.info(f"Received Telegram command: {user_text}")
-
-                    handler = self.command_router.get(user_text, self._cmd_send_menu)
-                    handler()
+                    if "@" in user_text:
+                        self._cmd_send_custom_test(user_text)
+                    else:
+                        handler = self.command_router.get(user_text, self._cmd_send_menu)
+                        handler()
 
                 time.sleep(self.poll_interval)
 
@@ -103,43 +105,15 @@ class TelegramBotWorker(threading.Thread):
         self.telegram_svc.send_message(msg)
 
     def _cmd_run_mail_tester(self):
-        logger.info("Fulfilling request: Run Deliverability Test")
-
-        unique_id = uuid.uuid4().hex[:10]
-        test_email_prefix = f"test-{unique_id}"
-        target_email = f"{test_email_prefix}@{self.MAIL_TESTER_DOMAIN}"
-        report_url = f"{self.MAIL_TESTER_BASE_URL}/{test_email_prefix}"
-
-        self.telegram_svc.send_message(f"Dispatching test email to <b>{target_email}</b>...\nPlease wait.")
-
-        try:
-            subject = "Custom AI Engineering for Test Company"
-            body = self.template_str.format(
-                founder_name="Test Founder",
-                company_name="Test Company"
-            )
-
-            success = self.email_service.send_email(
-                to_address=target_email,
-                subject=subject,
-                body=body
-            )
-
-            if success:
-                msg = (
-                    "<b>Test Email Dispatched Successfully!</b>\n\n"
-                    "Mail-Tester will now analyze your headers, IP reputation, and SPF/DKIM records.\n\n"
-                    f"<b>Click here to view your live report:</b>\n{report_url}\n\n"
-                    "<i>Note: It may take 10-20 seconds for the report to fully render on the website.</i>"
-                )
-                self.telegram_svc.send_message(msg)
-            else:
-                self.telegram_svc.send_message(
-                    "<b>Error:</b> The email service failed to dispatch the test message. Check your SMTP configurations.")
-
-        except Exception as e:
-            logger.error(f"Failed to execute Mail-Tester command: {e}", exc_info=True)
-            self.telegram_svc.send_message(f"<b>System Error:</b> Could not complete the test. Reason: {e}")
+        """Instructs the user how to run a deliverability test with the new workflow."""
+        msg = (
+            "<b>Deliverability Test Instructions:</b>\n\n"
+            "1. Open <a href='https://www.mail-tester.com'>mail-tester.com</a> in your browser.\n"
+            "2. Copy the exact random email address displayed on their screen.\n"
+            "3. <b>Paste that email address directly into this chat.</b>\n\n"
+            "The daemon will instantly fire a test template to that inbox so you can check your spam score."
+        )
+        self.telegram_svc.send_message(msg)
 
     def _cmd_send_menu(self):
         msg = (
@@ -151,3 +125,31 @@ class TelegramBotWorker(threading.Thread):
             "<b>4</b> - Run Deliverability Test (Mail-Tester)"
         )
         self.telegram_svc.send_message(msg)
+
+
+    def _cmd_send_custom_test(self, target_email: str):
+        """Fires a test email to any address pasted into the chat."""
+        self.telegram_svc.send_message(f"Dispatching test outreach to <b>{target_email}</b>...")
+
+        try:
+            subject = "Custom AI Engineering / Python Architecture"
+            body = self.template_str.format(
+                founder_name="Hiring Manager",
+                company_name="Tech Corp"
+            )
+
+            success = self.email_service.send_email(
+                to_address=target_email,
+                subject=subject,
+                body=body
+            )
+
+            if success:
+                self.telegram_svc.send_message(
+                    "<b>Test Email Dispatched Successfully!</b>\nCheck the inbox to verify formatting and deliverability.")
+            else:
+                self.telegram_svc.send_message("<b>Error:</b> SMTP dispatch failed. Check logs.")
+
+        except Exception as e:
+            logger.error(f"Failed to execute custom test: {e}", exc_info=True)
+            self.telegram_svc.send_message(f"<b>System Error:</b> {e}")

@@ -58,11 +58,12 @@ class GenerateSearchQueriesSignature(dspy.Signature):
     <instruction>
     Generate 10 diverse DuckDuckGo search queries using Boolean logic.
     STRATEGY:
-    - 30% Multiplier Search: Target Tech Recruitment Agencies + AI.
-    - 40% Broad Tech Search: Target established tech companies, startups, and software agencies.
-    - 30% Job Search: Target general hiring intent for Python/Data/AI.
+    - 40% Pure Software/SaaS Companies: Queries targeting "software company", "SaaS startup", "AI product firm".
+    - 30% Tech Recruiters: Queries targeting "IT recruitment agency", "tech headhunter", "software engineering staffing".
+    - 30% Tech Consultancies: Queries targeting "software development agency", "digital transformation consultancy".
 
     ANCHORING: Every single query MUST include one of the specific geographic locations provided in the target_intent.
+    ANTI-PATTERN: Do NOT use generic job search terms like "jobs", "hiring", or "salary" to avoid job boards. Use business discovery terms like "about us", "our services", or "our clients".
     </instruction>
     """
     cv_context: str = dspy.InputField(desc="The candidate's resume and background enclosed in <context> tags.")
@@ -77,23 +78,16 @@ class EvaluateWebpageSignature(dspy.Signature):
     <system>You are a highly adaptable AI/Tech Recruitment Matchmaker.</system>
     <instruction>
     Evaluate the webpage to identify if this company is a match for Jack Gell.
-    We are casting a WIDE NET. Jack is open to Full-Time roles, Contract work, Freelance projects, or Agency representation.
 
-    EXPANSION RULES (DO NOT PRUNE):
-    - DO NOT PRUNE staffing firms, tech recruiters, or software agencies. They are highly valuable force multipliers.
-    - DO NOT PRUNE established tech companies or startups just because they don't have an active job posting right now. If they have an established AI/Python workforce, they are a valid networking target.
+    EXPANSION RULES (STRICT FILTERING):
+    - ONLY set decision to FOLLOW or CONVERT if the company's core business is selling software, tech consulting, or IT recruitment.
+    - PRUNE non-tech companies (e.g., a hospital, a retail brand, a real estate firm) even if they mention Python or AI.
+    - PRUNE all job boards, salary aggregators, and tech news articles.
 
-    NAVIGATION STRATEGY (STOP HALLUCINATING URLS):
-    1. If you are on a Job Board or LinkedIn profile and identify a tech company:
-       - DO NOT guess their sub-pages (e.g. don't guess /careers).
-       - Instead, set decision to FOLLOW and provide the ROOT DOMAIN (e.g. https://company.com).
-    2. If you are already on the company's website:
-       - ONLY FOLLOW links that are actually visible in the provided content.
-
-    EXTRACTION & CONVERSION (STRICT EMAIL RULE):
-    1. YOU MUST HAVE AN EMAIL TO CONVERT. If you find a human email (Founder, HR, CTO) or generic email (careers@, info@) AND the company is a match, set decision to CONVERT.
-    2. If the company is a match but NO EMAIL is visible on the current page, set decision to FOLLOW and extract target URLs like /contact, /about, /team, or /careers to hunt for the email.
-    3. PRUNE ONLY non-business noise (Tutorials, Forums, Personal blogs).
+    NAVIGATION STRATEGY:
+    1. If you are on a Tech Company or IT Recruiter website:
+       - ONLY FOLLOW links that are actually visible in the provided content to find an email (e.g., /contact, /about, /team).
+    2. YOU MUST HAVE AN EMAIL TO CONVERT. If you find a human email (Founder, HR, CTO) or generic email (careers@, info@) AND the company is a match, set decision to CONVERT.
     </instruction>
     """
 

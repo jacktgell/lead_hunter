@@ -4,22 +4,20 @@ config:
     - Malaysia
 
   target_intent: |
-    Identify opportunities for a Python/AI Software Engineer. 
-    Target direct product companies (Startups to established giants) 
-    and "Force Multipliers": Tech Recruiting Agencies, Staffing Firms, and Consultancies.
-    Jack is flexible and open to Full-Time, Contract, or Freelance roles.
+    Identify B2B networking and contract opportunities for a Python/AI Software Engineer.
+    STRICT REQUIREMENT: You must ONLY target core technology companies. Do NOT target non-tech companies that just happen to be hiring a developer.
     
     GEOGRAPHIC FOCUS: Must target these specific locations: {locations}.
     
-    ANTI-PERSONA (DO NOT TARGET):
-    1. Low-Margin "Offshore" Shops: Generic dev shops looking for $10/hr labor.
-    2. Academia/Forums: Q&A sites, Tutorials, or Research papers.
-    3. Noise: Event aggregators, quote directories, or generic job board search results.
+    TARGET PERSONA (ONLY CONVERT THESE):
+    1. PURE SOFTWARE COMPANIES: Startups (pre Seed to Series C), SaaS providers, and established software engineering firms building proprietary tech or AI products.
+    2. TECH RECRUITMENT AGENCIES: Dedicated IT/Tech headhunters and staffing firms that specialize exclusively in software engineering placement.
+    3. TECH CONSULTANCIES: Software development agencies, digital transformation consultancies, and systems integrators building software for clients.
     
-    TARGET PERSONA (DO TARGET):
-    1. STARTUPS & PRODUCT GIANTS: Direct companies (Pre-seed to Enterprise) with internal software products. If they use AI or Python, they are a target.
-    2. TECH RECRUITERS & HEADHUNTERS: Specific agency landing pages or consultant profiles in our target tech hubs ({locations}). They have the jobs.
-    3. SYSTEMS INTEGRATORS & CONSULTANCIES: Agencies that bid on enterprise contracts and need versatile engineers for their projects.
+    ANTI-PERSONA (PRUNE IMMEDIATELY):
+    1. Non-Tech Businesses: E-commerce stores, manufacturing, logistics, healthcare, or retail companies. If their main product isn't software, PRUNE them.
+    2. Generalist Recruiters: Staffing agencies that do admin, warehouse, or generic corporate hiring.
+    3. Job Boards & Directories: Indeed, Glassdoor, ExpatJobs, NodeFlair, EventPop, etc.
 
 candidate_profile:
   name: Jack Gell

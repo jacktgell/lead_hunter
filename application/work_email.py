@@ -97,21 +97,31 @@ class BackgroundEmailWorker(threading.Thread):
             company_name=lead.company_name
         )
 
-        success = self.email_service.send_email(
-            to_address=lead.email,
-            subject=EmailWorkerConstants.DEFAULT_SUBJECT,
-            body=body
-        )
+        try:
+            # Attempt to send the email
+            success = self.email_service.send_email(
+                to_address=lead.email,
+                subject=EmailWorkerConstants.DEFAULT_SUBJECT,
+                body=body
+            )
 
-        if success:
-            self.db.mark_contacted(lead.email)
-            self._notify_success(lead)
+            if success:
+                # Email delivered successfully
+                self.db.mark_contacted(lead.email)
+                self._notify_success(lead)
 
-            sleep_time = self._calculate_jittered_sleep()
-            logger.info(f"Outreach successful. Throttling for {sleep_time}s.")
-            time.sleep(sleep_time)
-        else:
-            self._handle_failure(lead)
+                sleep_time = self._calculate_jittered_sleep()
+                logger.info(f"Outreach successful. Throttling for {sleep_time}s.")
+                time.sleep(sleep_time)
+            else:
+                # Soft failure (e.g., timeout, network issue). Proceed with normal retry logic.
+                self._handle_failure(lead)
+
+        except SmtpHardBounceError:
+            # Hard failure (e.g., recipient 550 rejected). Kill the lead immediately.
+            logger.error(f"Lead {lead.email} resulted in a hard bounce. Bypassing retries and marking as DEAD.")
+            self.db.mark_failed(lead.email)
+            self._inject_fallback_lead()
 
     def run(self) -> None:
         """Main worker execution loop."""

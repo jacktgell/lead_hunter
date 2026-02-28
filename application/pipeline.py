@@ -9,6 +9,7 @@ from application.tracker import GraphTracker
 from core.interfaces import ILLMProvider, ISearchEngine, IWebBrowser, ILeadRepository
 from core.config import PipelineConfig
 from core.logger import get_logger
+from domain.validators import ApiEmailValidator
 
 logger = get_logger(__name__)
 
@@ -194,6 +195,10 @@ class LeadGenerationPipeline:
             email = str(data.get('email', '')).strip()
             company = str(data.get('company', PipelineConstants.DEFAULT_NA)).strip()
             person = str(data.get('person', PipelineConstants.DEFAULT_NA)).strip()
+
+            if not ApiEmailValidator.is_deliverable(email, self.config.email.verification_api_key):
+                logger.warning(f"Invalid email detected via API: {email}. Flagging for enrichment.")
+                email = f"NEEDS_ENRICHMENT@{company.replace(' ', '').lower()}.com"
 
             if not email or "@" not in email:
                 logger.warning(f"Qualified lead missing email: {company}. Flagging for enrichment.")

@@ -21,6 +21,9 @@ class SmtpDeliveryError(Exception):
     """Domain-specific exception indicating a failure in the SMTP protocol or authentication."""
     pass
 
+class SmtpHardBounceError(Exception):
+    """Raised when the SMTP server explicitly rejects the recipient (e.g., 550 error)."""
+    pass
 
 class SmtpEmailService(IEmailService):
     """
@@ -66,6 +69,10 @@ class SmtpEmailService(IEmailService):
 
             logger.info(f"Successfully delivered email payload to {to_address}")
             return True
+
+        except smtplib.SMTPRecipientsRefused as e:
+            logger.error(f"HARD BOUNCE for {to_address}: {str(e)}")
+            raise SmtpHardBounceError(f"Recipient refused: {to_address}")
 
         except smtplib.SMTPException as e:
             wrapped_error = SmtpDeliveryError(f"Protocol rejection or auth failure: {str(e)}")

@@ -48,8 +48,8 @@ class DuckDuckGoSearch(ISearchEngine):
         safe_query = query
 
         # Relying on the LLM to inject location text (e.g., "London"),
-        # so we use the worldwide region "wt-wt" to prevent DDG localization conflicts.
-        logger.info(f"Executing global search query [wt-wt]: {safe_query}")
+        # so we use the worldwide region "th-th" to prevent DDG localization conflicts.
+        logger.info(f"Executing global search query [th-th]: {safe_query}")
         valid_urls: List[str] = []
 
         try:
@@ -66,7 +66,7 @@ class DuckDuckGoSearch(ISearchEngine):
             with DDGS() as ddgs:
                 results = ddgs.text(
                     safe_query,
-                    region="wt-wt",  # Enforces a neutral geographic baseline
+                    region="th-th",  # Enforces a neutral geographic baseline
                     max_results=fetch_limit,
                     backend="api"
                 )

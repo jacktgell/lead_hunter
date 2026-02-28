@@ -23,6 +23,7 @@ class EnvKeys:
     SMTP_PASSWORD = "SMTP_PASSWORD"
     TELEGRAM_BOT_TOKEN = "TELEGRAM_BOT_TOKEN"
     TELEGRAM_CHAT_ID = "TELEGRAM_CHAT_ID"
+    EMAIL_VERIFICATION_API_KEY = "EMAIL_VERIFICATION_API_KEY"
 
 
 class ConfigConstants:
@@ -94,6 +95,7 @@ class EmailConfig(BaseModel):
     sender_password: str
     queue_process_interval_sec: int
     template_path: str
+    verification_api_key: str
 
 
 class TelegramConfig(BaseModel):
@@ -195,6 +197,7 @@ def _inject_environment_secrets(yaml_data: Dict[str, Any]) -> Dict[str, Any]:
     email_data = yaml_data.setdefault('email', {})
     email_data['sender_email'] = os.getenv(EnvKeys.SMTP_EMAIL, "")
     email_data['sender_password'] = os.getenv(EnvKeys.SMTP_PASSWORD, "")
+    email_data['verification_api_key'] = os.getenv(EnvKeys.EMAIL_VERIFICATION_API_KEY, "")
 
     if not email_data['sender_email'] or not email_data['sender_password']:
         raise ConfigurationError(f"Missing required SMTP credentials in environment variables.")
